@@ -11,52 +11,52 @@ import CoreMotion
 
 class StepViewController: UIViewController {
     
+    //MARK: =====UI Elements=====
+    @IBOutlet weak var yesterdayLabel: UILabel!
+    @IBOutlet weak var yesterdaySlider: UISlider!
+    @IBOutlet weak var yesterdayFlagImage: UIImageView!
+    
+    @IBOutlet weak var todayLabel: UILabel!
+    @IBOutlet weak var todaySlider: UISlider!
+    @IBOutlet weak var todayFlagImage: UIImageView!
+    
+    @IBOutlet weak var currentActivityImage: UIImageView!
+    
     //MARK: =====class variables=====
     let activityManager = CMMotionActivityManager()
     let pedometer = CMPedometer()
     let motion = CMMotionManager()
+    
     var totalSteps: Float = 0.0 {
         willSet(newtotalSteps){
             DispatchQueue.main.async{
-                self.stepsSlider.setValue(newtotalSteps, animated: true)
-                self.stepsLabel.text = "Steps: \(newtotalSteps)"
+                self.todaySlider.setValue(newtotalSteps, animated: true)
+                self.todayLabel.text = "Today's Steps: \(newtotalSteps)"
             }
         }
     }
     
-    //MARK: =====UI Elements=====
-    @IBOutlet weak var stepsSlider: UISlider!
-    @IBOutlet weak var stepsLabel: UILabel!
-    @IBOutlet weak var isWalking: UILabel!
-    
-    
     //MARK: =====View Lifecycle=====
     override func viewDidLoad() {
+        
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        self.yesterdaySlider.isEnabled = false
+        self.todaySlider.isEnabled = false
+        
+        // TODO: Set up yesterday Steps
+        let yesterdaySteps = 100
+        let yesterdayGoal = 100;
+        self.yesterdaySlider.maximumValue = Float(yesterdayGoal)
+        self.yesterdaySlider.value = StepViewController.clamp(val: Float(yesterdaySteps), leftBounds: 0, rightBounds: Float(yesterdayGoal))
+        self.yesterdayLabel.text = "Yesterday's Steps: \(yesterdaySteps)"
+        if (yesterdaySteps >= yesterdayGoal)
+        {
+            self.yesterdayFlagImage.image = UIImage(named:"flag_up.png")
+        }
+        
         self.totalSteps = 0.0
         self.startActivityMonitoring()
         self.startPedometerMonitoring()
-        self.startMotionUpdates()
-    }
-    
-    
-    // MARK: =====Raw Motion Functions=====
-    func startMotionUpdates(){
-        // some internal inconsistency here: we need to ask the device manager for device
-        
-        // TODO: should we be doing this from the MAIN queue? You will need to fix that!!!....
-        if self.motion.isDeviceMotionAvailable{
-            self.motion.startDeviceMotionUpdates(to: OperationQueue.main,
-                                                 withHandler: self.handleMotion)
-        }
-    }
-    
-    func handleMotion(_ motionData:CMDeviceMotion?, error:Error?){
-        if let gravity = motionData?.gravity {
-            let rotation = atan2(gravity.x, gravity.y) - Double.pi
-            self.isWalking.transform = CGAffineTransform(rotationAngle: CGFloat(rotation))
-        }
     }
     
     // MARK: =====Activity Methods=====
@@ -73,7 +73,14 @@ class StepViewController: UIViewController {
         // unwrap the activity and disp
         if let unwrappedActivity = activity {
             DispatchQueue.main.async{
-                self.isWalking.text = "Walking: \(unwrappedActivity.walking)\n Still: \(unwrappedActivity.stationary)"
+                if(unwrappedActivity.stationary) {self.currentActivityImage.image = UIImage(named:"still.png")}
+                else if (unwrappedActivity.walking) {self.currentActivityImage.image = UIImage(named:"walking.png")}
+                else if (unwrappedActivity.running) {self.currentActivityImage.image = UIImage(named:"running.png")}
+                else if (unwrappedActivity.cycling) {self.currentActivityImage.image = UIImage(named:"cycling.png")}
+                else if (unwrappedActivity.automotive) {self.currentActivityImage.image = UIImage(named:"driving.png")}
+                else {
+                    NSLog("Unknown Activity Action")
+                }
             }
         }
     }
@@ -92,6 +99,15 @@ class StepViewController: UIViewController {
         if let steps = pedData?.numberOfSteps {
             self.totalSteps = steps.floatValue
         }
+    }
+    
+    // MARK: =====Static Methods=====
+    // Float Clamp Function
+    static func clamp(val: Float, leftBounds:Float, rightBounds:Float) -> Float
+    {
+        if (val < leftBounds) {return leftBounds}
+        if (val > rightBounds) {return rightBounds}
+        return val
     }
 
 

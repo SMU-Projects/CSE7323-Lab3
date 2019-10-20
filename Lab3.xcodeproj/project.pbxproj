@@ -17,6 +17,7 @@
 		B65DD9A3235C3FB900B066AC /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65DD9A2235C3FB900B066AC /* GameViewController.swift */; };
 		B65DD9A5235C3FF600B066AC /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65DD9A4235C3FF600B066AC /* GameScene.swift */; };
 		B65DD9A7235C430800B066AC /* StepViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65DD9A6235C430800B066AC /* StepViewController.swift */; };
+		B65DD9B2235D119500B066AC /* StepModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65DD9B1235D119500B066AC /* StepModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		B65DD9A2235C3FB900B066AC /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		B65DD9A4235C3FF600B066AC /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		B65DD9A6235C430800B066AC /* StepViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepViewController.swift; sourceTree = "<group>"; };
+		B65DD9B1235D119500B066AC /* StepModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,8 +83,9 @@
 				B65DD9A6235C430800B066AC /* StepViewController.swift */,
 				B65DD9A2235C3FB900B066AC /* GameViewController.swift */,
 				B65DD9A4235C3FF600B066AC /* GameScene.swift */,
-				B65DD994235C34CE00B066AC /* Assets.xcassets */,
 				B65DD9A1235C3FB800B066AC /* Lab3-Bridging-Header.h */,
+				B65DD9B1235D119500B066AC /* StepModel.swift */,
+				B65DD994235C34CE00B066AC /* Assets.xcassets */,
 			);
 			path = Lab3;
 			sourceTree = "<group>";
@@ -159,6 +162,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B65DD9A5235C3FF600B066AC /* GameScene.swift in Sources */,
+				B65DD9B2235D119500B066AC /* StepModel.swift in Sources */,
 				B65DD9A3235C3FB900B066AC /* GameViewController.swift in Sources */,
 				B65DD990235C34CD00B066AC /* ViewController.m in Sources */,
 				B65DD9A7235C430800B066AC /* StepViewController.swift in Sources */,
