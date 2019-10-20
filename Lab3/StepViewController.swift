@@ -26,6 +26,7 @@ class StepViewController: UIViewController {
     let activityManager = CMMotionActivityManager()
     let pedometer = CMPedometer()
     let motion = CMMotionManager()
+    let model = StepModel()
     
     var totalSteps: Float = 0.0 {
         willSet(newtotalSteps){
@@ -44,8 +45,8 @@ class StepViewController: UIViewController {
         self.todaySlider.isEnabled = false
         
         // TODO: Set up yesterday Steps
-        let yesterdaySteps = 100
-        let yesterdayGoal = 100;
+        let yesterdaySteps = self.getYesterdaySteps()
+        let yesterdayGoal = self.model.getYesterdayGoal()
         self.yesterdaySlider.maximumValue = Float(yesterdayGoal)
         self.yesterdaySlider.value = StepViewController.clamp(val: Float(yesterdaySteps), leftBounds: 0, rightBounds: Float(yesterdayGoal))
         self.yesterdayLabel.text = "Yesterday's Steps: \(yesterdaySteps)"
@@ -64,7 +65,7 @@ class StepViewController: UIViewController {
         // is activity is available
         if CMMotionActivityManager.isActivityAvailable(){
             // update from this queue (should we use the MAIN queue here??.... )
-            self.activityManager.startActivityUpdates(to: OperationQueue.main, withHandler: self.handleActivity)
+            self.activityManager.startActivityUpdates(to: OperationQueue.init(), withHandler: self.handleActivity)
         }
         
     }
@@ -99,6 +100,15 @@ class StepViewController: UIViewController {
         if let steps = pedData?.numberOfSteps {
             self.totalSteps = steps.floatValue
         }
+    }
+    
+    public func getYesterdaySteps() -> Int {
+        
+        return 100
+    }
+    
+    public func getTodaySteps() -> Int {
+        return 0
     }
     
     // MARK: =====Static Methods=====

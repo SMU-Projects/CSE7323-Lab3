@@ -10,20 +10,13 @@ import UIKit
 
 class StepModel: NSObject {
     
-    public func getYesterdaySteps() -> Int {
-        return 0
-    }
-    
-    public func getTodaySteps() -> Int {
-        return 0
-    }
     
     public func getTodayGoal() -> Int {
-        return 0
+        return 100
     }
     
     public func getYesterdayGoal() -> Int {
-        return 0
+        return 100
     }
     
 }
