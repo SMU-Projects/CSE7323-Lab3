@@ -10,13 +10,43 @@ import UIKit
 
 class StepModel: NSObject {
     
-    
-    public func getTodayGoal() -> Int {
-        return 100
+    static public func getLast24HourGoal() -> Float {
+        
+        let defaults = UserDefaults.standard
+        let goal = defaults.float(forKey: "24HourGoal")
+        return goal
     }
     
-    public func getYesterdayGoal() -> Int {
-        return 100
+    static public func setLast24HourGoal(goal:Float) {
+        
+        let defaults = UserDefaults.standard
+        defaults.set(goal, forKey: "24HourGoal")
     }
     
+    static public func getLast48HourGoal() -> Float {
+        
+        let defaults = UserDefaults.standard
+        let goal = defaults.float(forKey: "48HourGoal")
+        return goal
+    }
+    
+    static public func setLast48HourGoal(goal:Float) {
+        
+        let defaults = UserDefaults.standard
+        defaults.set(goal, forKey: "48HourGoal")
+    }
+    
+    static public func getLives() -> Int {
+        
+        let defaults = UserDefaults.standard
+        let lives = defaults.integer(forKey: "lives")
+        return lives
+    }
+    
+    static public func setLives(lives:Int) {
+        
+        let defaults = UserDefaults.standard
+        defaults.set(lives, forKey: "lives")
+    }
+
 }

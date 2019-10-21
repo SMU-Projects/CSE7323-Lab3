@@ -12,13 +12,13 @@ import CoreMotion
 class StepViewController: UIViewController {
     
     //MARK: =====UI Elements=====
-    @IBOutlet weak var yesterdayLabel: UILabel!
-    @IBOutlet weak var yesterdaySlider: UISlider!
-    @IBOutlet weak var yesterdayFlagImage: UIImageView!
+    @IBOutlet weak var last48HourLabel: UILabel!
+    @IBOutlet weak var last48HourSlider: UISlider!
+    @IBOutlet weak var last48HourFlagImage: UIImageView!
     
-    @IBOutlet weak var todayLabel: UILabel!
-    @IBOutlet weak var todaySlider: UISlider!
-    @IBOutlet weak var todayFlagImage: UIImageView!
+    @IBOutlet weak var last24HourLabel: UILabel!
+    @IBOutlet weak var last24HourSlider: UISlider!
+    @IBOutlet weak var last24HourFlagImage: UIImageView!
     
     @IBOutlet weak var currentActivityImage: UIImageView!
     
@@ -26,36 +26,50 @@ class StepViewController: UIViewController {
     let activityManager = CMMotionActivityManager()
     let pedometer = CMPedometer()
     let motion = CMMotionManager()
-    let model = StepModel()
     
-    var totalSteps: Float = 0.0 {
-        willSet(newtotalSteps){
+    var last24HourSteps: Float = 0.0 {
+        willSet(newlast24HourSteps){
             DispatchQueue.main.async{
-                self.todaySlider.setValue(newtotalSteps, animated: true)
-                self.todayLabel.text = "Today's Steps: \(newtotalSteps)"
+                self.last24HourLabel.text = "Today, you walked \(newlast24HourSteps) steps!"
+                self.last24HourSlider.setValue(newlast24HourSteps, animated: true)
+                if (Float(StepModel.getLast24HourGoal()) < newlast24HourSteps)
+                {
+                    self.last24HourFlagImage.image = UIImage(named:"flag_up.png")
+                }
+                else
+                {
+                    self.last24HourFlagImage.image = UIImage(named:"flag_down.png")
+                }
+            }
+        }
+    }
+    
+    var last48HourSteps: Float = 0.0 {
+        willSet(newlast48HourSteps){
+            DispatchQueue.main.async{
+                self.last48HourLabel.text = "Yesterday, you walked \(newlast48HourSteps) steps!"
+                self.last48HourSlider.setValue(newlast48HourSteps, animated: true)
+                if (Float(StepModel.getLast48HourGoal()) < newlast48HourSteps)
+                {
+                   self.last48HourFlagImage.image = UIImage(named:"flag_up.png")
+                }
+                else
+                {
+                    self.last48HourFlagImage.image = UIImage(named:"flag_down.png")
+                }
             }
         }
     }
     
     //MARK: =====View Lifecycle=====
-    override func viewDidLoad() {
-        
-        super.viewDidLoad()
-        self.yesterdaySlider.isEnabled = false
-        self.todaySlider.isEnabled = false
-        
-        // TODO: Set up yesterday Steps
-        let yesterdaySteps = self.getYesterdaySteps()
-        let yesterdayGoal = self.model.getYesterdayGoal()
-        self.yesterdaySlider.maximumValue = Float(yesterdayGoal)
-        self.yesterdaySlider.value = StepViewController.clamp(val: Float(yesterdaySteps), leftBounds: 0, rightBounds: Float(yesterdayGoal))
-        self.yesterdayLabel.text = "Yesterday's Steps: \(yesterdaySteps)"
-        if (yesterdaySteps >= yesterdayGoal)
-        {
-            self.yesterdayFlagImage.image = UIImage(named:"flag_up.png")
-        }
-        
-        self.totalSteps = 0.0
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.last24HourSlider.maximumValue = Float(StepModel.getLast24HourGoal())
+        self.last48HourSlider.maximumValue = Float(StepModel.getLast48HourGoal())
+        self.last48HourSlider.isEnabled = false
+        self.last24HourSlider.isEnabled = false
+        self.getLast24HourSteps()
+        self.getLast48HourSteps()
         self.startActivityMonitoring()
         self.startPedometerMonitoring()
     }
@@ -98,28 +112,47 @@ class StepViewController: UIViewController {
     //ped handler
     func handlePedometer(_ pedData:CMPedometerData?, error:Error?)->(){
         if let steps = pedData?.numberOfSteps {
-            self.totalSteps = steps.floatValue
+            self.last24HourSteps += steps.floatValue
         }
     }
     
-    public func getYesterdaySteps() -> Int {
+    public func getLast24HourSteps(){
+        let now = Date()
+        let last24Hours = now.addingTimeInterval(-60*60*24)
+        self.pedometer.queryPedometerData(from: last24Hours, to: now, withHandler: handleLast24HourPedometer)
+    }
+    
+    func handleLast24HourPedometer(_ pedData:CMPedometerData?, error:Error?)->(){
+        if let steps = pedData?.numberOfSteps {
+            self.last24HourSteps = steps.floatValue
+        }
+    }
+    
+    public func getLast48HourSteps(){
         
-        return 100
+        let now = Date()
+        let last24Hours = now.addingTimeInterval(-60*60*24)
+        let last48Hours = last24Hours.addingTimeInterval(-60*60*24)
+        self.pedometer.queryPedometerData(from: last48Hours, to: last24Hours, withHandler: handleLast48HourPedometer)
     }
     
-    public func getTodaySteps() -> Int {
-        return 0
+    func handleLast48HourPedometer(_ pedData:CMPedometerData?, error:Error?)->(){
+        if let steps = pedData?.numberOfSteps {
+            self.last48HourSteps = steps.floatValue
+        }
     }
     
-    // MARK: =====Static Methods=====
-    // Float Clamp Function
-    static func clamp(val: Float, leftBounds:Float, rightBounds:Float) -> Float
-    {
-        if (val < leftBounds) {return leftBounds}
-        if (val > rightBounds) {return rightBounds}
-        return val
+    override func viewWillDisappear(_ animated: Bool) {
+        let value = (self.last24HourSteps - StepModel.getLast24HourGoal())/100
+        if (value < 0)
+        {
+            StepModel.setLives(lives:0)
+        }
+        else
+        {
+            StepModel.setLives(lives:Int(value)+1)
+        }
+        
     }
-
-
 }
 

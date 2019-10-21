@@ -11,8 +11,6 @@ import SpriteKit
 import CoreMotion
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
-
-    //@IBOutlet weak var scoreLabel: UILabel!
     
     // MARK: Raw Motion Functions
     let motion = CMMotionManager()
@@ -33,11 +31,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     // MARK: View Hierarchy Functions
     let spinBlock = SKSpriteNode()
-    let scoreLabel = SKLabelNode(fontNamed: "Chalkduster")
-    var score:Int = 0 {
+    let livesLabel = SKLabelNode(fontNamed: "Chalkduster")
+    var lives:Int = StepModel.getLives() {
         willSet(newValue){
             DispatchQueue.main.async{
-                self.scoreLabel.text = "Score: \(newValue)"
+                self.livesLabel.text = "Lives: \(newValue)"
             }
         }
     }
@@ -63,44 +61,45 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         self.addSprite()
         
-        self.addScore()
-        
-        self.score = 0
+        self.addLives()
     }
     
     // MARK: Create Sprites Functions
-    func addScore(){
+    func addLives(){
+    
+        livesLabel.fontSize = 20
+        livesLabel.fontColor = SKColor.black
+        livesLabel.position = CGPoint(x: frame.midX, y: frame.minY)
         
-        scoreLabel.text = "Score: 0"
-        scoreLabel.fontSize = 20
-        scoreLabel.fontColor = SKColor.blue
-        scoreLabel.position = CGPoint(x: frame.midX, y: frame.minY)
-        
-        addChild(scoreLabel)
+        addChild(livesLabel)
     }
     
     
     func addSprite(){
-        let spriteA = SKSpriteNode(imageNamed: "sprite") // this is literally a sprite bottle... 😎
-        
-        spriteA.size = CGSize(width:size.width*0.1,height:size.height * 0.1)
-        
-        let randNumber = random(min: CGFloat(0.1), max: CGFloat(0.9))
-        spriteA.position = CGPoint(x: size.width * randNumber, y: size.height * 0.75)
-        
-        spriteA.physicsBody = SKPhysicsBody(rectangleOf:spriteA.size)
-        spriteA.physicsBody?.restitution = random(min: CGFloat(1.0), max: CGFloat(1.5))
-        spriteA.physicsBody?.isDynamic = true
-        spriteA.physicsBody?.contactTestBitMask = 0x00000001
-        spriteA.physicsBody?.collisionBitMask = 0x00000001
-        spriteA.physicsBody?.categoryBitMask = 0x00000001
-        
-        self.addChild(spriteA)
+        if (self.lives > 0)
+        {
+            let spriteA = SKSpriteNode(imageNamed: "still_sprite.png")
+            
+            spriteA.size = CGSize(width:size.width*0.1,height:size.height * 0.1)
+            
+            let randNumber = random(min: CGFloat(0.1), max: CGFloat(0.9))
+            spriteA.position = CGPoint(x: size.width * randNumber, y: size.height * 0.75)
+            
+            spriteA.physicsBody = SKPhysicsBody(rectangleOf:spriteA.size)
+            spriteA.physicsBody?.restitution = random(min: CGFloat(1.0), max: CGFloat(1.5))
+            spriteA.physicsBody?.isDynamic = true
+            spriteA.physicsBody?.contactTestBitMask = 0x00000001
+            spriteA.physicsBody?.collisionBitMask = 0x00000001
+            spriteA.physicsBody?.categoryBitMask = 0x00000001
+            
+            self.lives -= 1
+            self.addChild(spriteA)
+        }
     }
     
     func addBlockAtPoint(_ point:CGPoint){
         
-        spinBlock.color = UIColor.red
+        spinBlock.color = UIColor.black
         spinBlock.size = CGSize(width:size.width*0.15,height:size.height * 0.05)
         spinBlock.position = point
         
@@ -118,7 +117,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func addStaticBlockAtPoint(_ point:CGPoint){
         let 🔲 = SKSpriteNode()
         
-        🔲.color = UIColor.red
+        🔲.color = UIColor.black
         🔲.size = CGSize(width:size.width*0.1,height:size.height * 0.05)
         🔲.position = point
         
@@ -146,7 +145,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         top.position = CGPoint(x:size.width*0.5, y:size.height)
         
         for obj in [left,right,top]{
-            obj.color = UIColor.red
+            obj.color = UIColor.black
             obj.physicsBody = SKPhysicsBody(rectangleOf:obj.size)
             obj.physicsBody?.isDynamic = true
             obj.physicsBody?.pinned = true
@@ -158,12 +157,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // MARK: =====Delegate Functions=====
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.addSprite()
-    }
-    
-    func didBegin(_ contact: SKPhysicsContact) {
-        if contact.bodyA.node == spinBlock || contact.bodyB.node == spinBlock {
-            self.score += 1
-        }
     }
     
     // MARK: Utility Functions (thanks ray wenderlich!)
