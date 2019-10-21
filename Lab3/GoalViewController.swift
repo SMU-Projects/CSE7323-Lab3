@@ -19,9 +19,8 @@ class GoalViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
     }
+    
     @IBAction func last24HourGoalSliderAction(_ sender: Any) {
         self.last24HourGoalLabel.text = "Today's Goal: \(self.last24HourGoalSlider.value) Steps"
     }
